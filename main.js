@@ -24,6 +24,19 @@ const displayAlert = (text, action) => {
   }, 2000);
 };
 
+// List etiketi icinden eleman silme
+const deleteItem = (e) => {
+  const element = e.currentTarget.parentElement.parentElement;
+  const id = element.dataset.id;
+  list.removeChild(element);
+  displayAlert("Basariyla silindi", "danger");
+};
+
+const editItem = (e) => {
+  const element = e.currentTarget.parentElement.parentElement;
+  editElement = e.currentTarget.parentElement.previousElementSibling; // kardes elementi sectik
+};
+
 const addItem = (e) => {
   e.preventDefault();
   const value = grocery.value; // form icindeki input degeri alindi
@@ -48,8 +61,15 @@ const addItem = (e) => {
         </div>  
     `;
 
+    const deleteBtn = element.querySelector(".delete-btn");
+    deleteBtn.addEventListener("click", deleteItem);
+
+    const editBtn = element.querySelector(".edit-btn");
+    editBtn.addEventListener("click", editItem);
+
     list.appendChild(element);
     displayAlert("Basariyla eklendi", "success");
+    container.classList.add("show-container");
   }
 };
 
