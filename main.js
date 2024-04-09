@@ -38,6 +38,7 @@ const deleteItem = (e) => {
   list.removeChild(element);
   displayAlert("Deleted successfully", "danger");
   setBackToDefault();
+  removeFormLocalStorage(id);
 };
 
 const editItem = (e) => {
@@ -93,6 +94,7 @@ const addItem = (e) => {
   } else if (value !== "" && editFlag) {
     editElement.innerText = value;
     displayAlert("Updated successfully", "success");
+    editLocalStorage(editID, value);
     setBackToDefault();
   }
 };
@@ -106,9 +108,39 @@ const clearItem = () => {
     });
   }
 
+  localStorage.clear();
   container.classList.remove("show-container");
   displayAlert("List deleted successfully", "danger");
   setBackToDefault();
+};
+
+const createListItem = (id, value) => {
+  const element = document.createElement("article");
+  let attr = document.createAttribute("data-id");
+  attr.value = id;
+  element.setAttributeNode(attr);
+  element.classList.add("grocery-item");
+
+  element.innerHTML = `
+        <p class="title">${value}</p>
+        <div class="btn-container">
+            <button type="button" class="edit-btn">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button type="button" class="delete-btn">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>  `;
+
+  const deleteBtn = element.querySelector(".delete-btn");
+  deleteBtn.addEventListener("click", deleteItem);
+
+  const editBtn = element.querySelector(".edit-btn");
+  editBtn.addEventListener("click", editItem);
+
+  list.appendChild(element);
+  displayAlert("Created successfully", "success");
+  container.classList.add("show-container");
 };
 
 const addToLocalStorage = (id, value) => {
@@ -126,5 +158,41 @@ const getLocalStorage = () => {
     : [];
 };
 
+const setUpItems = () => {
+  let items = getLocalStorage();
+  if (items.length > 0) {
+    items.forEach((item) => {
+      createListItem(item.id, item.value);
+    });
+  }
+};
+
+// local storage den veri silme
+const removeFormLocalStorage = (id) => {
+  let items = getLocalStorage();
+
+  items = items.filter((item) => {
+    if (item.id !== id) {
+      return item;
+    }
+  });
+
+  localStorage.setItem("list", JSON.stringify(items));
+};
+
+const editLocalStorage = (id, value) => {
+  let items = getLocalStorage();
+
+  items = items.map((item) => {
+    if (item.id === id) {
+      item.value = value;
+    }
+    return item;
+  });
+
+  localStorage.setItem("list", JSON.stringify(items));
+};
+
 form.addEventListener("submit", addItem);
 clearBtn.addEventListener("click", clearItem);
+window.addEventListener("DOMContentLoaded", setUpItems);
